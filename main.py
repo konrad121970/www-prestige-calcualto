@@ -1,5 +1,6 @@
 from graph_builder import GraphBuilder
 from incidence_list_reader import IncidenceListReader
+from prestige_calculator import MatrixProcessor
 
 incidence_list_path = 'resources/incidence_list.txt'
 
@@ -12,3 +13,6 @@ print(incidence_list)
 
 graph_builder = GraphBuilder(incidence_list)
 graph_builder.draw_graph()
+
+processor = MatrixProcessor(graph_builder.adjacency_matrix)
+prestige_value = processor.calculate_prestige(specific_column=1)
