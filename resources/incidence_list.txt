@@ -1,3 +1,5 @@
-strona A: strona B, strona C
-strona B: strona C
-strona C:
+strona A: strona B, strona C, strona D, strona E
+strona B: strona E
+strona C: strona B
+strona D: strona C
+strona E:
