@@ -6,19 +6,22 @@ import tkinter as tk
 from tkinter import filedialog
 
 class IncidenceListReader:
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self):
+        self.incidents_data = []
 
-    def read_incidents_from_file(self):
-        with open(self.file_path, 'r') as file:
-            incidents = [line.strip().split(':') for line in file]
-        return [(left.strip(), [element.strip() for element in right.split(',')]) for left, right in incidents]
+    def read_incidents_from_text_widget(self, text_widget):
+        text_content = text_widget.get("1.0", tk.END)
+        incidents = [line.strip().split(':') for line in text_content.splitlines() if line]
+        self.incidents_data = [(left.strip(), [element.strip() for element in right.split(',')]) for left, right in incidents]
+
+    def get_incidents_data(self):
+        return self.incidents_data
 
 def update_graph_and_matrix():
-    incidence_list = incidence_list_reader.read_incidents_from_file()
+    incidence_list_reader.read_incidents_from_text_widget(incidence_text)
 
     # Update DataFrame
-    df = pd.DataFrame(incidence_list, columns=['source', 'target'])
+    df = pd.DataFrame(incidence_list_reader.get_incidents_data(), columns=['source', 'target'])
 
     # Update directed graph from data
     G.clear()
@@ -37,14 +40,8 @@ def update_graph_and_matrix():
     adjacency_text.delete(1.0, tk.END)
     adjacency_text.insert(tk.END, str(adjacency_matrix))
 
-def print_matrix_to_console():
-    print("eh")
-
-def load_incidence_list():
-    incidence_list_path = filedialog.askopenfilename(title="Select Incidence List File", filetypes=[("Text files", "*.txt")])
-    file_path_entry.delete(0, tk.END)
-    file_path_entry.insert(0, incidence_list_path)
-    incidence_list_reader.file_path = incidence_list_path
+# Function to update graph and matrix when the text widget is edited
+def on_text_edit(event):
     update_graph_and_matrix()
 
 # Create directed graph
@@ -56,18 +53,11 @@ root.title("Graph and Adjacency Matrix Viewer")
 root.geometry("1200x600")
 
 # Create Tkinter widgets
-file_path_entry = tk.Entry(root, width=50)
-file_path_entry.grid(row=0, column=0, padx=10, pady=10)
-
-file_path_button = tk.Button(root, text="Load Incidence List", command=load_incidence_list)
-file_path_button.grid(row=0, column=1, padx=10, pady=10)
+incidence_text = tk.Text(root, height=5, width=50)
+incidence_text.grid(row=0, column=0, padx=10, pady=10)
 
 update_button = tk.Button(root, text="Update Graph and Matrix", command=update_graph_and_matrix)
-update_button.grid(row=1, column=0, columnspan=2, pady=10)
-
-# Button to print matrix to console
-print_matrix_button = tk.Button(root, text="Print Matrix to Console", command=print_matrix_to_console)
-print_matrix_button.grid(row=1, column=1, padx=10, pady=10)
+update_button.grid(row=1, column=0, pady=10)
 
 # Embed Matplotlib plot in Tkinter window
 fig, ax = plt.subplots()
@@ -80,7 +70,10 @@ adjacency_text = tk.Text(root, height=20, width=40)
 adjacency_text.grid(row=2, column=1, padx=10, pady=10)
 
 # Create incidence list reader instance
-incidence_list_reader = IncidenceListReader("")
+incidence_list_reader = IncidenceListReader()
+
+# Bind the on_text_edit function to the text widget's key release event
+incidence_text.bind("<KeyRelease>", on_text_edit)
 
 # Start the main event loop
 root.mainloop()
