@@ -6,45 +6,13 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
 from tkinter import filedialog
 
-class IncidenceListReader:
-    def __init__(self):
-        self.incidents_data = []
-
-    def read_incidents_from_text_widget(self, text_widget):
-        text_content = text_widget.get("1.0", tk.END)
-        incidents = [line.strip().split(':') for line in text_content.splitlines() if line]
-        self.incidents_data = [(left.strip(), [element.strip() for element in right.split(',')]) for left, right in incidents]
-
-    def load_incidents_from_file(self, file_path):
-        with open(file_path, 'r') as file:
-            for line in file:
-                # Split line into two parts by ":"
-                parts = line.strip().split(':')
-
-                # Extract left and right side of incyfency list
-                left_side = parts[0].strip()
-                right_side = parts[1].strip()
-
-                # Split the right side into individual elements using "," as a separator
-                right_side_elements = [element.strip() for element in right_side.split(',')]
-
-                # Tuple representing the incident and add it to the list
-                incident = (left_side, right_side_elements)
-                self.incidents_data.append(incident)
-
-
-        # with open(file_path, 'r') as file:
-        #     content = file.read()
-        # self.incidents_data = [tuple(line.strip().split(':')) for line in content.splitlines() if line]
-
-    def get_incidents_data(self):
-        return self.incidents_data
+from incidence_list_reader import IncidenceListReader
 
 def update_graph_and_matrix():
-    incidence_list_reader.read_incidents_from_text_widget(incidence_text)
+    incidents = IncidenceListReader.read_incidents_from_text_widget(incidence_text, tk)
 
     # Update DataFrame
-    df = pd.DataFrame(incidence_list_reader.get_incidents_data(), columns=['source', 'target'])
+    df = pd.DataFrame(incidents, columns=['source', 'target'])
 
     # Update directed graph from data
     G.clear()
@@ -67,9 +35,9 @@ def update_graph_and_matrix():
 def load_file():
     file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
     if file_path:
-        incidence_list_reader.load_incidents_from_file(file_path)
+        incidents = IncidenceListReader.read_incidents_from_file(file_path)
         incidence_text.delete(1.0, tk.END)
-        incidence_text.insert(tk.END, "\n".join([f"{item[0]}: {', '.join(item[1])}" for item in incidence_list_reader.get_incidents_data()]))
+        incidence_text.insert(tk.END, "\n".join([f"{item[0]}: {', '.join(item[1])}" for item in incidents]))
         update_graph_and_matrix()
 
 # Function to update graph and matrix when the text widget is edited
@@ -106,7 +74,7 @@ adjacency_text = tk.Text(root, height=20, width=40)
 adjacency_text.grid(row=2, column=1, padx=10, pady=10)
 
 # Create incidence list reader instance
-incidence_list_reader = IncidenceListReader()
+#incidence_list_reader = IncidenceListReader()
 
 # Bind the on_text_edit function to the text widget's key release event
 incidence_text.bind("<KeyRelease>", on_text_edit)

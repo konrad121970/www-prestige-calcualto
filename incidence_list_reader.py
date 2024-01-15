@@ -1,10 +1,9 @@
 class IncidenceListReader:
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.incidents = []
+    @staticmethod
+    def read_incidents_from_file(file_path):
+        incidents = []
 
-    def read_incidents_from_file(self):
-        with open(self.file_path, 'r') as file:
+        with open(file_path, 'r') as file:
             for line in file:
                 # Split line into two parts by ":"
                 parts = line.strip().split(':')
@@ -18,7 +17,13 @@ class IncidenceListReader:
 
                 # Tuple representing the incident and add it to the list
                 incident = (left_side, right_side_elements)
-                self.incidents.append(incident)
+                incidents.append(incident)
 
-    def get_incidents(self):
-        return self.incidents
+            return incidents
+
+    @staticmethod
+    def read_incidents_from_text_widget(text_widget, tk):
+        text_content = text_widget.get("1.0", tk.END)
+        incidents = [line.strip().split(':') for line in text_content.splitlines() if line]
+        incidents_data = [(left.strip(), [element.strip() for element in right.split(',')]) for left, right in incidents]
+        return incidents_data

@@ -2,7 +2,7 @@ from graph_builder import GraphBuilder
 from incidence_list_reader import IncidenceListReader
 from prestige_calculator import MatrixProcessor
 
-incidence_list_path = 'resources/incidence_list.txt'
+incidence_list_path = 'data/incidence_list.txt'
 
 incidence_list_reader = IncidenceListReader(incidence_list_path)
 incidence_list_reader.read_incidents_from_file()
