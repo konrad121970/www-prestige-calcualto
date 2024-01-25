@@ -19,6 +19,10 @@ class MainApplication:
         self.page_rank_button = tk.Button(root, text="Calculate PageRank", command=self.calculate_pagerank)
         self.page_rank_button.grid(row=0, column=1, padx=10, pady=10)
 
+        # Save Matrix to CSV Button
+        self.save_csv_button = tk.Button(root, text="Save Matrix to CSV", command=self.save_matrix_to_csv)
+        self.save_csv_button.grid(row=1, column=1, padx=10, pady=10)
+
         # Update Graph and Matrix Button
         self.update_button = tk.Button(root, text="Update Graph and Matrix", command=self.update_graph_and_matrix)
         self.update_button.grid(row=1, column=0, pady=5, padx=5)
@@ -87,9 +91,6 @@ class MainApplication:
         self.adjacency_text.delete(1.0, tk.END)
         self.adjacency_text.insert(tk.END, str(adjacency_matrix))
 
-
-
-
     def update_graph_and_matrix(self):
         self.update_graph()
         self.update_matrix()
@@ -101,6 +102,17 @@ class MainApplication:
             self.incidence_text.delete(1.0, tk.END)
             self.incidence_text.insert(tk.END, "\n".join([f"{item[0]}: {', '.join(item[1])}" for item in incidents]))
             self.update_graph_and_matrix()
+
+    def save_matrix_to_csv(self):
+        adjacency_matrix = nx.linalg.graphmatrix.adjacency_matrix(self.G).todense()
+        node_names = list(self.G.nodes)
+        df = pd.DataFrame(adjacency_matrix, index=node_names, columns=node_names)
+        file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+
+        if file_path:
+            df.to_csv(file_path)
+            print(f"Adjacency matrix saved to: {file_path}")
+
 
     def on_text_edit(self, event):
         self.update_graph_and_matrix()
