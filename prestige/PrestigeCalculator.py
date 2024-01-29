@@ -5,11 +5,12 @@ import numpy as np
 class PrestigeCalculator:
     @staticmethod
     def normalize_matrix(matrix):
-        matrix = matrix.astype(float)
-        matrix /= matrix.sum(axis=1, keepdims=True)
-        matrix = np.nan_to_num(matrix, nan=0)
-        return matrix
-
+        result = []
+        for row in matrix:
+            row_sum = sum(row)
+            normalized_row = [element / row_sum if row_sum != 0 else 0 for element in row]
+            result.append(normalized_row)
+        return np.array(result)
     @staticmethod
     def poweriteration(matrix, websites):
         transposed_matrix = np.transpose(matrix)
